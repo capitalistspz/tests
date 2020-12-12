@@ -1,9 +1,10 @@
 #include "stack.h"
-
+// Comments in header file 
 template <typename T>
 Node<T> Stack<T>::pop() {
 	std::shared_ptr<Node> x = top;
 	top = top->next;
+	x->next = nullptr;
 	--size;
 	return *x;
 }
