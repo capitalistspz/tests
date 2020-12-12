@@ -5,6 +5,9 @@ namespace starter
     //Queue structure. Can only be modified by 'popping' the first object in the queue
     class queue<T>
     {
+        private UInt32 realLast, last, start;
+        private T[] arr;
+        
         //Creates a queue of size q_size
         public queue(UInt32 q_size) {
             realLast = (q_size == 0) ? 10 : q_size * 2;
@@ -12,8 +15,6 @@ namespace starter
             arr = new T[realLast];
             start = 0;
         }
-        private UInt32 realLast, last, start;
-        private T[] arr;
         public UInt32 Size { get => last-start; }
         public T peek_front() { return arr[0]; }
         public T peak_back() { return arr[last-1]; }
@@ -64,8 +65,6 @@ namespace starter
                     throw new ArgumentException("Index is out of range:" + i.ToString());
             }
         }*/
-
-
     }
 
     class Program
