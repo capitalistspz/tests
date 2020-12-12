@@ -5,18 +5,19 @@
 template <typename T>
 struct Stack
 {
-	Stack(shared_ptr<Node<T>> _top = nullptr) : top(_top) { size += 1; }
+	Stack();
+	Stack(shared_ptr<Node<T>> _top) : top(_top) { size += 1; }
 	Stack(Node<T>& _top) {	top = make_shared<Node<T>> (top); size += 1; }
-	Node<T> pop(); // Remove top Node<T>
-	void push(shared_ptr<Node<T>> newTop); // Add new top Node<T>
-	void push(Node<T> &newTop);
-	bool isEmpty(); // Check if the stack has no member Node<T>s.
-	size_t getSize();
-	bool hasValue(T val);
-	Node<T>* begin();
+	Node<T> pop(); // Removes top node and returns it.
+	void push(shared_ptr<Node<T>> newTop); // Add new top node
+	void push(Node<T> &newTop); // Deletes
+	bool isEmpty(); // Check if the stack has no member Node<T>.
+	size_t getSize(); // Gets the number of elements in the stack.
+	bool hasValue(T val); // Linear search for value
+	Node<T>* begin(); // Begin iterator
 private:
-	std::shared_ptr<Node<T>> top;
-	size_t size = 0;
+	std::shared_ptr<Node<T>> top; // Top node
+	size_t size = 0; // Keeps track of the stack size
 };
 
 #endif
