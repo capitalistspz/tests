@@ -39,7 +39,7 @@ namespace starter
             else
             {
                 // Array is expanded by creating a new, larger array containing all the old values and assigning to the original array.
-                realLast = last + 1 * 2;
+                realLast = last * 2 + 1;
                 T[] newArr = new T[realLast];
                 for (uint i = 0; i < last; ++i)
                     newArr[i] = arr[i];
