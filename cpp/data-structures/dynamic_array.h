@@ -3,9 +3,10 @@
 #include <iostream>
 #include <sstream>
 #include <algorithm>
-
+#include <vector>
 template <typename T>
 struct dynamic_array {
+	
 	dynamic_array(std::size_t size = 0){
 		// The array size is set to the exact size input to save space
 		real_size = size;
@@ -13,13 +14,22 @@ struct dynamic_array {
 		arr = new T[size];
 	}
 
+	// Copy constructor
+	dynamic_array(const dynamic_array<T>& dyn_arr) {
+		size_ = dyn_arr.size();
+		real_size = size_;
+		arr = new T[size_];
+		std::copy(dyn_arr.begin(), dyn_arr.end(), arr);
+	}
 	// Add an element to the array.
 	void append(const T element) {
 		if (size_ < real_size)
-			//// Simply increase accessible size and place. O(1) time.
+			//// Simply increase accessible size and place. 
+			// O(1) time.
 			arr[size_++] = element;
 		else {
-			//// Allocate more space to the array. O(n) time. O(n^2) space.
+			//// Allocate more space to the array. 
+			// O(n) time. O(n^2) space.
 
 			// Creating the new array
 			real_size = real_size * real_size + 1; // n * n + 1 space
@@ -35,7 +45,8 @@ struct dynamic_array {
 
 		}
 	}
-	// For reading from an index. O(1) time.
+	// For reading from an index.
+	// Takes O(1) time.
 	T operator[](std::size_t index) const {
 		if (index < size_)
 			return arr[index];
@@ -43,14 +54,16 @@ struct dynamic_array {
 			throw std::out_of_range("Index out of range");
 	}
 
-	// For reading from and writing to an index. O(1) time.
+	// For reading from and writing to an index.
+	// Takes O(1) time.
 	T& operator[](std::size_t index) {
 		if (index < size_)
 			return arr[index];
 		else
 			throw std::out_of_range("Index out of range");
 	}
-	// Creates copy array from inclusive start to exclusive end. O(n) time.
+	// Creates copy array from inclusive start to exclusive end.
+	// Takes O(n) time.
 	dynamic_array<T> sub_array(std::size_t start, std::size_t end, bool reverse = false) {
 		// Only allow the function to work if the start and end positions are valid
 		if (start < size_ && end <= size_) {
@@ -73,7 +86,8 @@ struct dynamic_array {
 			throw std::out_of_range("Index out of range");
 	}
 
-	// Joins two arrays together resulting in a new one. O(n) time.
+	// Joins two arrays together resulting in a new one. 
+	// Takes O(n) time.
 	dynamic_array<T> operator+(const dynamic_array<T> &other) {
 		// Create an array big enough to accomodate all the values
 		auto new_size = size_ + other.size();
@@ -81,15 +95,19 @@ struct dynamic_array {
 
 		// Copy elements into the new array
 		std::copy(arr, arr + size_, out.begin());
-		std::copy(other.begin(), other.end(), out.end());
+
+		// Copy onto where the first array ended
+		std::copy(other.begin(), other.end(), out.begin() + size_);
 
 		return out;
 	}
 
-	// Extend an array using another array. O(n) time.
+	// Extend an array using another array. 
+	// Takes O(n) time.
 	void extend(const dynamic_array<T>& other) {
 		// Get total number of elements
-		auto new_size = other.size() + size_;
+		const auto new_size = other.size() + size_;
+
 		// If all elements are able to fit in the existing array, copy them in.
 		if (new_size <= real_size) {
 			std::copy(other.begin(), other.end(), arr + size_);
@@ -114,7 +132,8 @@ struct dynamic_array {
 		}
 	}
 
-	// Removes all elements from the array. O(1) time.
+	// Removes all elements from the array. 
+	// Takes O(1) time.
 	void clear() {
 		// Deletes the array
 		delete arr;
@@ -123,31 +142,38 @@ struct dynamic_array {
 		size_ = 0;
 		real_size = 0;
 	}
-	// Returns the number of elements in the array. O(1) time.
+	// Returns the number of elements in the array. 
+	// Takes O(1) time.
 	std::size_t size() const noexcept { return size_; }
 
-	// Returns a pointer to the first element. O(1) time.
+	// Returns a pointer to the first element. 
+	// Takes O(1) time.
 	T* begin() const { return arr; }
 
-	// Returns a pointer to the last element. O(1) time.
+	// Returns a pointer to the last element.
+	// Takes O(1) time.
 	T* end() const { return arr + size_; }
 
-	// Allows the array to be displayed using cout. O(n) time.
+	// Allows the array to be displayed using cout.
+	// Takes O(n) time.
 	friend std::ostream& operator<<(std::ostream& os, const dynamic_array<T>& dyn_arr) {
 		return os << dyn_arr.to_string();
 	}
 
-	// Returns whether the area is empty. O(1) time.
+	// Returns whether the area is empty.
+	// Takes O(1) time.
 	bool empty() const noexcept { return !size_; }
 
-	// Remove the element at the back of the array. O(1) time.
-	void remove_back() {
+	// Remove the element at the back of the array.
+	// Takes O(1) time.
+	void remove_back() noexcept {
 		// Doesn't actually remove it, just reduces the visible size
 		// Removing what is already there is rather pointless as when something gets added, it will be replaced anyway
 		if (size_)
 			--size_;
 	}
-	// Remove the element at that index from the array. O(n) time.
+	// Remove the element at that index from the array.
+	// Takes O(n) time.
 	void remove_at(std::size_t index) {
 		// Moves back all elements by one starting from the element after the one being removed
 		// Does nothing if the size is 0.
@@ -160,7 +186,8 @@ struct dynamic_array {
 		
 	}
 
-	// Returns a string representation of the array. O(n) time.
+	// Returns a string representation of the array.
+	// Takes O(n) time.
 	std::string to_string() const {
 		std::stringstream ss;
 		ss << '[';
@@ -173,8 +200,15 @@ struct dynamic_array {
 		ss << ']';
 		return ss.str();
 	}
-
-	// Return the internal array. O(1) time.
+	// Copy all elements into a vector to be outputted.
+	// Takes O(n) time. 
+	std::vector<T> to_vector() {
+		std::vector<T> vec(size_);
+		std::copy(arr, arr + size_, vec.begin());
+		return vec;
+	}
+	// Return the internal array.
+	// Takes O(1) time.
 	T* data() noexcept {
 		return arr;
 	}
