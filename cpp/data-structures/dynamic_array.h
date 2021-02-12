@@ -4,17 +4,18 @@
 #include <sstream>
 #include <algorithm>
 #include <vector>
+#include <cmath>
+
 template <typename T>
 struct dynamic_array {
-	
 	dynamic_array(std::size_t size = 0){
-		// The array size is set to the exact size input to save space
 		real_size = size;
 		size_ = size;
 		arr = new T[size];
 	}
 
-	// Copy constructor
+	// Copy constructor, copies all elements from the other array rather referencing it
+	// Takes O(n) time.
 	dynamic_array(const dynamic_array<T>& dyn_arr) {
 		size_ = dyn_arr.size();
 		real_size = size_;
@@ -29,10 +30,10 @@ struct dynamic_array {
 			arr[size_++] = element;
 		else {
 			//// Allocate more space to the array. 
-			// O(n) time. O(n^2) space.
+			// O(n) time. Allocated space increases by n space.
 
 			// Creating the new array
-			real_size = real_size * real_size + 1; // n * n + 1 space
+			real_size = std::pow(2U, power++); 
 			T* new_arr = new T[real_size];
 
 			// Copy all elements from old array to new along with the new element.
@@ -64,15 +65,11 @@ struct dynamic_array {
 	}
 	// Creates copy array from inclusive start to exclusive end.
 	// Takes O(n) time.
-	dynamic_array<T> sub_array(std::size_t start, std::size_t end, bool reverse = false) {
+	dynamic_array<T> sub_array(std::size_t start, std::size_t end, bool reverse = false) const {
 		// Only allow the function to work if the start and end positions are valid
 		if (start < size_ && end <= size_) {
-
-			// Get the length of the array
-			const auto length = end - start;
-
-			// Create an array with that length
-			dynamic_array<T> sub(length);
+			// Create an array with the length
+			dynamic_array<T> sub(end - start);
 
 			// Copy the elements to the new array. Takes (end-start) time
 			if (!reverse)
@@ -125,6 +122,7 @@ struct dynamic_array {
 			std::copy(other.begin(), other.end(), new_arr + size_);
 
 			// Change sizes to match and replace original array with new larger array
+			power = 0;
 			size_ = new_size;
 			real_size = new_size;
 			delete arr;
@@ -132,15 +130,17 @@ struct dynamic_array {
 		}
 	}
 
-	// Removes all elements from the array. 
+	// Removes all elements and deallocates the memory. 
 	// Takes O(1) time.
 	void clear() {
 		// Deletes the array
 		delete arr;
+		arr = nullptr;
 
 		// Both sizes set to 0 to allow append to reallocate the array.
 		size_ = 0;
 		real_size = 0;
+		power = 0;
 	}
 	// Returns the number of elements in the array. 
 	// Takes O(1) time.
@@ -168,7 +168,7 @@ struct dynamic_array {
 	// Takes O(1) time.
 	void remove_back() noexcept {
 		// Doesn't actually remove it, just reduces the visible size
-		// Removing what is already there is rather pointless as when something gets added, it will be replaced anyway
+		// Removing what is already there is pointless because as soon as something gets added, it will be replaced anyway
 		if (size_)
 			--size_;
 	}
@@ -212,6 +212,24 @@ struct dynamic_array {
 	T* data() noexcept {
 		return arr;
 	}
+
+	// Preallocates a certain amount of memory for the array
+	// Takes O(n) time.
+	void reserve(std::size_t count) {
+		// Avoids allocating more space when enough is allocated
+		if (count > real_size) {
+			T* new_arr = new T[count];
+
+			// Copy all elements through to the new array
+			std::copy(arr, arr + size_, new_arr);
+
+			// Change the array and size
+			power = 0;
+			real_size = count;
+			delete arr;
+			arr = new_arr;
+		}
+	}
 private:
 	// Internal array
 	T* arr = nullptr;
@@ -221,4 +239,7 @@ private:
 
 	// Externally accessible size
 	std::size_t size_ = 0;
+
+	// Power to be raised by when the array is expanded
+	std::size_t power = 0;
 };
