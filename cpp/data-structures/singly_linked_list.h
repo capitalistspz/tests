@@ -70,9 +70,11 @@ public:
 		return get_node_at(pos).val;
 	}
 
-	// Returns a pointer to the first node. Takes O(n) time.
+	// Returns a pointer to the first node. 
+	// Takes O(n) time.
 	T* get_front() const noexcept { return &first->val; }
-	// Returns whether the list has any elements. 
+
+	// Returns true if the list has any elements. 
 	// Takes O(1) time.
 	bool empty() const noexcept { return !first; }
 
@@ -99,12 +101,30 @@ public:
 	// Takes O(n) time.
 	std::vector<T> to_vector() {
 		std::vector<T> vec;
-		node* iter = first;
+		vec.reserve(count);
+		node *iter = first;
 		while (iter) {
 			vec.push_back(iter->val);
 			iter = iter->next;
 		}
 		return vec;
+	}
+
+	// Remove all elements from the list
+	// Takes O(n) time.
+	void clear() {
+		node *iter = first;
+		node *prev = nullptr;
+		while (iter) {
+			prev = iter;
+			iter = iter->next;
+			delete prev;
+		}
+		first = nullptr;
+		count = 0;
+	}
+	~singly_linked_list() {
+		clear();
 	}
 protected:
 	// Iterates through nodes until a certain number of nodes have been traversed and return the node. 
