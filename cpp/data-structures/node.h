@@ -3,7 +3,7 @@
 #include <memory>
 #include <utility>
 #include <iostream>
-
+// This node structure is used by the stack structure
 using std::shared_ptr, std::make_shared;
 
 template <typename T>
