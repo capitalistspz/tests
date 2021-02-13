@@ -8,7 +8,7 @@
 
 template <typename T>
 struct dynamic_array {
-	dynamic_array(std::size_t size = 0){
+	dynamic_array(const std::size_t size = 0){
 		real_size = size;
 		size_ = size;
 		arr = new T[size];
@@ -48,7 +48,7 @@ struct dynamic_array {
 	}
 	// For reading from an index.
 	// Takes O(1) time.
-	T operator[](std::size_t index) const {
+	T operator[](const std::size_t index) const {
 		if (index < size_)
 			return arr[index];
 		else
@@ -57,7 +57,7 @@ struct dynamic_array {
 
 	// For reading from and writing to an index.
 	// Takes O(1) time.
-	T& operator[](std::size_t index) {
+	T& operator[](const std::size_t index) {
 		if (index < size_)
 			return arr[index];
 		else
@@ -65,7 +65,7 @@ struct dynamic_array {
 	}
 	// Creates copy array from inclusive start to exclusive end.
 	// Takes O(n) time.
-	dynamic_array<T> sub_array(std::size_t start, std::size_t end, bool reverse = false) const {
+	dynamic_array<T> sub_array(const std::size_t start, const std::size_t end, const bool reverse = false) const {
 		// Only allow the function to work if the start and end positions are valid
 		if (start < size_ && end <= size_) {
 			// Create an array with the length
@@ -209,13 +209,13 @@ struct dynamic_array {
 	}
 	// Return the internal array.
 	// Takes O(1) time.
-	T* data() noexcept {
+	T* data() const noexcept {
 		return arr;
 	}
 
 	// Preallocates a certain amount of memory for the array
 	// Takes O(n) time.
-	void reserve(std::size_t count) {
+	void reserve(const std::size_t count) {
 		// Avoids allocating more space when enough is allocated
 		if (count > real_size) {
 			T* new_arr = new T[count];
