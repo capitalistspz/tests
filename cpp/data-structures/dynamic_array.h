@@ -8,7 +8,7 @@
 
 template <typename T>
 struct dynamic_array {
-	dynamic_array(const std::size_t size = 0){
+	dynamic_array(const std::size_t size = 0) {
 		real_size = size;
 		size_ = size;
 		arr = new T[size];
@@ -33,7 +33,7 @@ struct dynamic_array {
 			// O(n) time. Allocated space increases by n space.
 
 			// Creating the new array
-			real_size = std::pow(2U, power++); 
+			real_size = std::pow(2U, power++);
 			T* new_arr = new T[real_size];
 
 			// Copy all elements from old array to new along with the new element.
@@ -41,7 +41,7 @@ struct dynamic_array {
 			new_arr[size_++] = element;
 
 			// Replace old array with new array.
-			delete arr;
+			delete[] arr;
 			arr = new_arr;
 
 		}
@@ -79,13 +79,13 @@ struct dynamic_array {
 
 			return sub;
 		}
-		else 
+		else
 			throw std::out_of_range("Index out of range");
 	}
 
 	// Joins two arrays together resulting in a new one. 
 	// Takes O(n) time.
-	dynamic_array<T> operator+(const dynamic_array<T> &other) {
+	dynamic_array<T> operator+(const dynamic_array<T>& other) {
 		// Create an array big enough to accomodate all the values
 		auto new_size = size_ + other.size();
 		dynamic_array<T> out(new_size);
@@ -125,7 +125,7 @@ struct dynamic_array {
 			power = 0;
 			size_ = new_size;
 			real_size = new_size;
-			delete arr;
+			delete[] arr;
 			arr = new_arr;
 		}
 	}
@@ -133,8 +133,8 @@ struct dynamic_array {
 	// Removes all elements and deallocates the memory. 
 	// Takes O(1) time.
 	void clear() {
-		// Deletes the array
-		delete arr;
+		// deletes the array
+		delete[] arr;
 		arr = nullptr;
 
 		// Both sizes set to 0 to allow append to reallocate the array.
@@ -183,7 +183,7 @@ struct dynamic_array {
 				arr[index] = arr[index + 1];
 			--size_;
 		}
-		
+
 	}
 
 	// Returns a string representation of the array.
@@ -191,7 +191,7 @@ struct dynamic_array {
 	std::string to_string() const {
 		std::stringstream ss;
 		ss << '[';
-		if (size_){
+		if (size_) {
 			const auto last = size_ - 1;
 			for (std::size_t i = 0; i < last; ++i)
 				ss << arr[i] << ", ";
@@ -226,7 +226,7 @@ struct dynamic_array {
 			// Change the array and size
 			power = 0;
 			real_size = count;
-			delete arr;
+			delete[] arr;
 			arr = new_arr;
 		}
 	}
