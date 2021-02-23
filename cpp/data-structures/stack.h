@@ -1,23 +1,45 @@
-#ifndef STACK_H
-#define STACK_H
-#include "node.h"
-
+#pragma once
 template <typename T>
-struct Stack
-{
-	Stack();
-	Stack(shared_ptr<Node<T>> _top) : top(_top) { size += 1; }
-	Stack(Node<T>& _top) {	top = make_shared<Node<T>> (top); size += 1; }
-	Node<T> pop(); // Removes top node and returns it.
-	void push(shared_ptr<Node<T>> newTop); // Add new top node
-	void push(Node<T> &newTop); // Deletes
-	bool isEmpty(); // Check if the stack has no member Node<T>.
-	size_t getSize(); // Gets the number of elements in the stack.
-	bool hasValue(T val); // Linear search for value
-	Node<T>* begin(); // Begin iterator
-private:
-	std::shared_ptr<Node<T>> top; // Top node
-	size_t size = 0; // Keeps track of the stack size
-};
+struct stack {
+	static struct node {
+		// Value of the number
+		T val;
+		// Pointer to next node
+		node* next = nullptr;
+	};
+	// Adds an element to the top of the stack
+	void push(const T& element) {
+		// Allocate the top node
+		node* newNode = new node{ element, nullptr };
+		
+		// The new node's next value is the top node
+		newNode->next = top;
+		
+		// Set the new node as the top node
+		top = newNode;
+	}
 
-#endif
+	// Removes top element from the stack and returns it
+	T pop() {
+		node* temp = top;
+		
+		// Value to be returned
+		T out = top->val;
+		
+		// Top is now the next node
+		top = top->next;
+		
+		// Deallocate memory
+		delete temp;
+		
+		return out;
+	}
+	
+	// Return the top value in the stack
+	T peek() const { return top->val;}
+
+	// Returns whether the stack is empty
+	bool empty() const { return !top; }
+private:
+	node* top = nullptr;
+};
