@@ -1,21 +1,69 @@
 #pragma once
 #include <stdexcept>
 #include <vector>
-
 template <typename T>
-class singly_linked_list {
-	template <typename T>
-	struct singly_linked_node {
-		singly_linked_node(T value) : val(value) {};
+class slist {
+protected:
+	struct node {
+		node(T value) : val(value) {};
 		// Holds the value stored in the node
 		T val;
 
 		// Pointer to the next node
-		singly_linked_node<T>* next = nullptr;
+		node* next = nullptr;
 	};
 public:
-	using node = singly_linked_node<T>;
+	struct iterator {
+		iterator(node* pointer) : ptr(pointer) {};
+		using iterator_category = std::forward_iterator_tag;
+		using value_type = T;
+		using pointer = T*;
+		using reference = T&;
+		// Do not use this
+		using difference_type = std::ptrdiff_t;
 
+		iterator& operator++ () {
+			ptr = ptr->next;
+			return *this;
+		}
+		iterator operator++ (int) {
+			iterator temp = *this;
+			ptr = ptr->next;
+			return temp;
+		}
+		bool operator == (const iterator& other) { return ptr == other.ptr; }
+		bool operator != (const iterator& other) { return ptr != other.ptr; }
+		reference operator*() { return ptr->val; }
+		pointer operator->() { return &(ptr->val); }
+	protected:
+		node* ptr;
+	};
+	struct const_iterator {
+		const_iterator(node* pointer) : ptr(pointer) {};
+		using iterator_category = std::forward_iterator_tag;
+		using value_type = T;
+		using pointer = T*;
+		using reference = T&;
+		// Do not use this
+		using difference_type = std::ptrdiff_t;
+
+		const_iterator& operator++ () {
+			ptr = ptr->next;
+			return *this;
+		}
+		const_iterator operator++ (int) {
+			const_iterator temp = *this;
+			ptr = ptr->next;
+			return temp;
+		}
+		bool operator == (const const_iterator& other) { return ptr == other.ptr; }
+		bool operator != (const const_iterator& other) { return ptr != other.ptr; }
+		const reference operator*() const { return ptr->val; }
+		const pointer operator->() const { return &(ptr->val); }
+	protected:
+		node* ptr;
+	};
+public:
 	// Adds an element onto the end of the list. 
 	// Takes O(n) time.
 	void append(T element) noexcept {
@@ -38,41 +86,40 @@ public:
 	void remove(T element) {
 		// Get address of the address of the first node
 		node** iter = &first;
-
-		// While there is a node at that location
-		while (node* temp = *iter) {
-			// Compare the value of the node with the element
-			if (temp->val == element) {
-				// Replace the node with the one it has its next
-				*iter = temp->next;
-
-				// Deallocate memory used for the deleted node
-				delete (temp);
-				--count;
-				break;
-			}
-
+		node* prev = nullptr;
+		// While there are still nodes to traverse and the element hasn't been found
+		while (*iter && (*iter)->val != element) {
+			prev = *iter;
 			// Move onto the next node
 			iter = &((*iter)->next);
-			
 		}
+		auto current = *iter;
+		// Replace the node with the one it has its next
+		*iter = (*iter)->next;
+
+		// Deallocate memory used for the deleted node 
+		delete current;
+		--count;
+		
 	}
 
 	// Linear search for the element and return a pointer to it. 
 	// Takes O(n) time.
 	T* find(T element) {
-		return &(find_node(element)->val);
+		return &((*find_node(element))->val);
 	}
 
-	// Returns the value in that "position".
-	// Takes O(n) time.
-	T& get_at(size_t pos) const {
-		return get_node_at(pos).val;
-	}
+	// Returns an iterator at the start
+	iterator begin() { return iterator(first); }
 
-	// Returns a pointer to the first node. 
-	// Takes O(n) time.
-	T* get_front() const noexcept { return &first->val; }
+	// Returns an iterator with nullptr
+	iterator end() { return iterator(nullptr); }
+
+	// Returns a const iterator at the start
+	const_iterator cbegin() { return const_iterator(first); }
+
+	// Returns a const iterator with nullptr
+	const_iterator cend() { return const_iterator(nullptr); }
 
 	// Returns true if the list has any elements. 
 	// Takes O(1) time.
@@ -80,7 +127,7 @@ public:
 
 	// Output the list to an output stream.
 	// Takes O(n) time.
-	friend std::ostream& operator<< (std::ostream& os, const singly_linked_list<T>& list) {
+	friend std::ostream& operator<< (std::ostream& os, const slist<T>& list) {
 		os << '[';
 		node *iter = list.first;
 		if (!list.empty()) {
@@ -123,26 +170,13 @@ public:
 		first = nullptr;
 		count = 0;
 	}
-	~singly_linked_list() {
+	~slist() {
 		clear();
 	}
 protected:
-	// Iterates through nodes until a certain number of nodes have been traversed and return the node. 
-	// Takes O(n) time.
-	node& get_node_at(size_t pos) const {
-		node* iter = first;
-		if (pos < count) {
-			for (std::size_t i = 0; i < pos; ++i)
-				iter = iter->next;
-			return *iter;
-		}
-		else
-			throw std::out_of_range("Index was out of range.\n");
-	}
-
 	// Linear search through the variables.
 	// Takes O(n) time.
-	node* find_node(T element) { 
+	node** find_node(T element) { 
 		// Get address of the address of the first node
 		node** iter = &first;
 
@@ -151,9 +185,9 @@ protected:
 			// Move onto the next node
 			iter = &((*iter)->next);
 		}
-		return *iter;
+		return iter;
 	}
-private:
+protected:
 	size_t count = 0;
 	node *first = nullptr;
 };
