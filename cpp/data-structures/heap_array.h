@@ -1,6 +1,6 @@
 #pragma once
 #include <iostream>
-#include <type_traits>
+#include <stdexcept>
 namespace pz {
 	template <typename T>
 	struct heap_array {
