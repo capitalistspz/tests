@@ -6,11 +6,8 @@ struct multi_bit {
 		// 3. AND mask with value to get the value with the selected bit set to false
 		// 4. Shift the input bool to the selected bit's position
 		// 5. OR masked value and other int bit to set the bit to value of what ever the bool is
-		value = (/*2*/ ~
-			(/*1*/ 1 << index)
-			/*3*/ & value)
-			/*5*/ |
-			(/*4*/ state << index);
+		value = ( ~(1 << index) & value)
+			|  state << index);
 	}
 	inline bool get(int index) {
 		return (value >> index) & 1;
